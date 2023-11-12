@@ -1,0 +1,22 @@
+services:
+
+  patgen-backend:
+    build:
+      context: ./patgen-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - server.port=8081
+      - server.forward-headers-strategy=${SERVER_FORWARD_HEADERS_STRATEGY:-NONE}
+      - patgen-backend.cors-registration.allowed-origins=http://localhost:8080 http://localhost:8082 ${PATGENFRONTEND_EXTERNAL_URL} ${ZIPCODESERVICE_EXTERNAL_URL}
+
+  zipcode-service:
+    build:
+      context: ./zipcode-service
+    ports:
+      - "8082:8082"
+    environment:
+      - server.port=8082
+      - server.forward-headers-strategy=${SERVER_FORWARD_HEADERS_STRATEGY:-NONE}
+      # Cors settings.
+      - zipcode-service.cors-registration.allowed-origins=http://localhost:8080 http://localhost:8081 ${PATGENFRONTEND_EXTERNAL_URL} ${PATGENBACKEND_EXTERNAL_URL}

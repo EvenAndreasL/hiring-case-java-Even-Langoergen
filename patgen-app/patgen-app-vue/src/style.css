@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary colors for <Button /> */
+    --primary: 217 100% 26%;
+    --primary-foreground: 210 40% 98%;
+
+    --background-start-rgb: #f3f7fd;
+    --background-end-rgb: #d2e3ff;
+  }
+}
+
+body {
+  width: 100%;
+  overflow: hidden;
+  font-display: auto;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+body main {
+  background: linear-gradient(to top, transparent, var(--background-end-rgb))
+    var(--background-start-rgb);
+}
+
+p {
+  font-size: 1.2em;
+}
+
+@layer components {
+  a:not([class]) {
+    font-weight: bold;
+    color: hsl(var(--primary));
+    border-bottom: 1px dotted hsl(var(--primary));
+  }
+  .btn-standard {
+    @apply h-10 px-4 py-2 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-hnikt-darkblue-800 text-slate-50 hover:bg-hnikt-darkblue-700;
+  }
+}

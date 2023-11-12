@@ -1,0 +1,88 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/java
+{
+	"name": "Java",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installMaven": "true",
+			"installGradle": "false"
+		},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"moby": true,
+			"installDockerBuildx": true,
+			"version": "latest",
+			"dockerDashComposeVersion": "v2"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "lts",
+			"nvmVersion": "latest"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/sshd:1": {
+				"version": "latest"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"github.vscode-github-actions",
+				"redhat.java",
+				"redhat.vscode-xml",
+				"redhat.fabric8-analytics",
+				"Vue.vscode-typescript-vue-plugin",
+				"esbenp.prettier-vscode",
+				"bradlc.vscode-tailwindcss",
+				"Vue.volar"
+			]
+		}
+	},
+	"containerEnv": {
+		"CONTAINER_PATGENFRONTEND_DOMAIN": "${localEnv:CODESPACE_NAME:devcontainer-is-not-running-in-github-codespaces}-8080.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:github.dev}",
+		"CONTAINER_PATGENBACKEND_DOMAIN": "${localEnv:CODESPACE_NAME:devcontainer-is-not-running-in-github-codespaces}-8081.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:github.dev}",
+		"CONTAINER_ZIPCODESERVICE_DOMAIN": "${localEnv:CODESPACE_NAME:devcontainer-is-not-running-in-github-codespaces}-8082.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:github.dev}"
+	},
+	"remoteEnv": {
+		"SERVER_FORWARD_HEADERS_STRATEGY": "NATIVE",
+		"PATGENFRONTEND_EXTERNAL_URL": "https://${containerEnv:CONTAINER_PATGENFRONTEND_DOMAIN}",
+		"PATGENBACKEND_EXTERNAL_URL": "https://${containerEnv:CONTAINER_PATGENBACKEND_DOMAIN}",
+		"ZIPCODESERVICE_EXTERNAL_URL": "https://${containerEnv:CONTAINER_ZIPCODESERVICE_DOMAIN}",
+		"WORKSPACE_FOLDER": "${containerWorkspaceFolder}",
+		"CODESPACES": "${localEnv:CODESPACES:false}" // Always true in Github Codespaces, otherwise false.
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		8080,
+		8081,
+		8082
+	],
+	"portsAttributes": {
+		"8080": {
+			"label": "patgen-app"
+		},
+		"8081": {
+			"label": "patgen-backend"
+		},
+		"8082": {
+			"label": "zipcode-service"
+		}
+	},
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "echo \"for f in \\${WORKSPACE_FOLDER}/.devcontainer/cli-shortcuts*.sh; do source \\$f; done\" >> /home/vscode/.bashrc",
+	// Optional sample step.
+	// "postAttachCommand": "cli-build-prerequisites",
+	"hostRequirements": {
+		"cpus": 2,
+		// 8gb memory is usually sufficient unless using testcontainers and running demanding docker instances,
+		// if that's the case bump to at least 16gb.
+		"memory": "8gb",
+		"storage": "16gb"
+	}
+	// Configure tool-specific properties.
+	// "customizations": {},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

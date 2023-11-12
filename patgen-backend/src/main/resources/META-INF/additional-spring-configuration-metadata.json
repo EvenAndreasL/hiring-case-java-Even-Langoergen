@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "demo.disable-web-security-for-sake-of-simplicity",
+      "type": "java.lang.String",
+      "description": "Set to true to disable web security for simplifying the demo."
+  }
+] }
