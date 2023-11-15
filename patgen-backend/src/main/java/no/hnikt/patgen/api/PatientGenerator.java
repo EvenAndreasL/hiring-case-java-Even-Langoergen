@@ -1,7 +1,9 @@
 package no.hnikt.patgen.api;
 
+import no.hnikt.patgen.component.AddressGenerator;
 import no.hnikt.patgen.component.AgeGenerator;
 import no.hnikt.patgen.component.NameGenerator;
+import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.model.PatientDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +33,22 @@ public class PatientGenerator {
     @Autowired
     private NameGenerator nameGenerator;
 
+    @Autowired 
+    private AddressGenerator addressGenerator;
+
+    @Autowired 
+    private PostalCodeGenerator postalCodeGenerator;
+
     @GetMapping("/generate-patient")
     public PatientDto generatePatient() {
         Integer age = ageGenerator.generateAge();
 
         String firstname = nameGenerator.maleFirstName();
         String lastname = nameGenerator.lastName();
-        return new PatientDto(firstname, lastname, age);
+        
+        String streetNameAndNumber = addressGenerator.streetNameAndNumber();
+        String postalCode = postalCodeGenerator.postalCode();
+        return new PatientDto(firstname, lastname, age, streetNameAndNumber, postalCode);
     }
 
     @GetMapping("/lastnames")

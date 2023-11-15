@@ -1,7 +1,9 @@
 package no.hnikt.patgen.api;
 
+import no.hnikt.patgen.component.AddressGenerator;
 import no.hnikt.patgen.component.AgeGenerator;
 import no.hnikt.patgen.component.NameGenerator;
+import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.config.WebConfig;
 import no.hnikt.patgen.enums.SexIso5218;
 import org.hamcrest.Matchers;
@@ -35,12 +37,20 @@ class PatientGeneratorTest {
     @MockBean
     private AgeGenerator ageGenerator;
 
+    @MockBean
+    private AddressGenerator addressGenerator;
+
+    @MockBean
+    private PostalCodeGenerator postalCodeGenerator;
+
     @BeforeEach
     void setUp() {
         when(ageGenerator.generateAge()).thenReturn(42);
         when(nameGenerator.maleFirstName()).thenReturn("Jet");
         when(nameGenerator.femaleFirstName()).thenReturn("Nina");
         when(nameGenerator.lastName()).thenReturn("Li");
+        when(addressGenerator.streetNameAndNumber()).thenReturn("Hollywood 42");
+        when(postalCodeGenerator.postalCode()).thenReturn("1337");
     }
 
     @Test
@@ -50,12 +60,16 @@ class PatientGeneratorTest {
                 status().isOk(),
                 jsonPath("$.age").value(42),
                 jsonPath("$.firstname").value("Jet"),
-                jsonPath("$.lastname").value("Li")
+                jsonPath("$.lastname").value("Li"),
+                jsonPath("$.streetNameAndNumber").value("Hollywood 42"),
+                jsonPath("$.postalCode").value("1337")
         );
 
         verify(this.ageGenerator, times(1)).generateAge();
         verify(this.nameGenerator, times(1)).maleFirstName();
         verify(this.nameGenerator, times(1)).lastName();
+        verify(this.addressGenerator, times(1)).streetNameAndNumber();
+        verify(this.postalCodeGenerator, times(1)).postalCode();
     }
 
     @Test

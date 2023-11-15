@@ -18,6 +18,6 @@ class SimpleAgeGeneratorTest {
         int actual = this.simpleAgeGenerator.generateAge();
         System.out.printf("Random age: %s%n", actual);
 
-        assertTrue(actual >= 0 && actual <= 100, String.format("Age %s is within 0 and 100", actual));
+        assertTrue(actual >= 0 && actual <= 100, String.format("Age %s is not within 0 and 100", actual));
     }
 }
