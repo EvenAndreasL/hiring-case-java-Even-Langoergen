@@ -17,7 +17,7 @@ public class WebConfig {
 
     @Value("${patgen-backend.cors-registration.allowed-origins:http://localhost:8080 http://localhost:8082}")
     private String allowedOrigins;
-
+    
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         String allowed = allowedOrigins.trim();
@@ -32,7 +32,7 @@ public class WebConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.requestMatchers("/**").permitAll());
+        http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.requestMatchers("/**").permitAll()).csrf((csrf) -> csrf.disable());
         return http.build();
     }
 }

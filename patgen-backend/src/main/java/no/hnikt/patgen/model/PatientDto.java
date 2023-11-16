@@ -3,10 +3,6 @@ package no.hnikt.patgen.model;
 import java.time.LocalDate;
 import java.time.Period;
 
-import org.springframework.cglib.core.Local;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Class for testpatient with randomized personal details
  * 
@@ -21,12 +17,14 @@ public class PatientDto {
 	private LocalDate birthDate;
     private String streetNameAndNumber;
     private String postalCode;
+    private String city;
 	
-	public PatientDto(String firstname, String lastname, String sex, LocalDate birthDate,
-     String streetNameAndNumber, String postalCode) {
-		if (firstname == null || lastname == null || sex == null || birthDate == null
-        || streetNameAndNumber == null || postalCode == null) {
-			throw new IllegalArgumentException("null is not valid");
+    
+    public PatientDto(String firstname, String lastname, String sex, LocalDate birthDate,
+    String streetNameAndNumber, String postalCode, String city) {
+        if (firstname == null || lastname == null || sex == null || birthDate == null
+        || streetNameAndNumber == null || postalCode == null || city == null) {
+            throw new IllegalArgumentException("null is not valid");
 		}
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -34,6 +32,7 @@ public class PatientDto {
 		this.birthDate = birthDate;
         this.streetNameAndNumber = streetNameAndNumber;
         this.postalCode = postalCode;
+        this.city = city;
 	}
 	
 	public String getFullName() {
@@ -41,13 +40,13 @@ public class PatientDto {
 	}
 	
 	public String getFirstname() {
-		return firstname;
+        return firstname;
 	}
-
+    
 	public String getLastname() {
-		return lastname;
+        return lastname;
 	}
-
+    
     public String getSex(){
         return sex;
     }
@@ -59,13 +58,16 @@ public class PatientDto {
 	public Integer getAge() {
 		return Period.between(birthDate, LocalDate.now()).getYears();
 	}
-
+    
     public String getStreetNameAndNumber() {
         return streetNameAndNumber;
     }
-
+    
     public String getPostalCode() {
         return postalCode;
     }
     
+    public String getCity() {
+        return city;
+    }
 }

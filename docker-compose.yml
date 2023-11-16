@@ -5,6 +5,8 @@ services:
       context: ./patgen-backend
     ports:
       - "8081:8081"
+    env_file:
+      - .env
     environment:
       - server.port=8081
       - server.forward-headers-strategy=${SERVER_FORWARD_HEADERS_STRATEGY:-NONE}
@@ -15,6 +17,8 @@ services:
       context: ./zipcode-service
     ports:
       - "8082:8082"
+    env_file:
+      - .env
     environment:
       - server.port=8082
       - server.forward-headers-strategy=${SERVER_FORWARD_HEADERS_STRATEGY:-NONE}

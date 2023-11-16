@@ -6,8 +6,12 @@ import no.hnikt.patgen.component.BirthdayGenerator;
 import no.hnikt.patgen.component.NameGenerator;
 import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.enums.SexIso5218;
+import no.hnikt.patgen.exception.NotFoundException;
 import no.hnikt.patgen.model.LastNamesPutRequest;
 import no.hnikt.patgen.model.PatientDto;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +24,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
+
 
 /**
  * @author Chuck Norris
@@ -34,16 +40,19 @@ import java.util.Random;
 @RestController
 public class PatientGenerator {
 
+    private final WebClient localApiClient;
+
+    
     private static final Logger LOG = LoggerFactory.getLogger(PatientGenerator.class);
-
+    
     private Random random = new Random(System.currentTimeMillis());
-
+    
     @Autowired
     private NameGenerator nameGenerator;
-
+    
     @Autowired 
     private AddressGenerator addressGenerator;
-
+    
     @Autowired 
     private PostalCodeGenerator postalCodeGenerator;
 
@@ -52,6 +61,11 @@ public class PatientGenerator {
 
     @Autowired
     private FileStore fileStore;
+    
+    public PatientGenerator() {
+        String zipCodeServiceUrl = System.getenv("ZIPCODESERVICE_EXTERNAL_URL");
+        this.localApiClient = WebClient.create(zipCodeServiceUrl);
+    }
 
     @GetMapping("/generate-patient")
     public PatientDto generatePatient(@RequestParam(value = "desiredSex", required = false) String desiredSex) {
@@ -84,7 +98,9 @@ public class PatientGenerator {
         String streetNameAndNumber = addressGenerator.streetNameAndNumber();
         String postalCode = postalCodeGenerator.postalCode();
 
-        return new PatientDto(firstname, lastname, sex, birthDate, streetNameAndNumber, postalCode);
+        String city = fetchCity(postalCode);
+
+        return new PatientDto(firstname, lastname, sex, birthDate, streetNameAndNumber, postalCode, city);
     }
 
     @GetMapping("/lastnames")
@@ -132,6 +148,25 @@ public class PatientGenerator {
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private String fetchCity(String postalCode){
+        String result = localApiClient
+            .get()
+            .uri("/zipcode-details?zipCode=" + postalCode)
+            .retrieve()
+            .onStatus(HttpStatus.NOT_FOUND::equals, res -> Mono.error(new NotFoundException("")))
+            .bodyToMono(String.class)
+            .onErrorResume(NotFoundException.class, res -> Mono.empty())
+            .retryWhen(Retry.fixedDelay(15, Duration.ofMillis(100))
+            .filter(this::is5xxServerError))
+            .block();
+        return result == null ? "" : result;
+    }
+
+    private boolean is5xxServerError(Throwable throwable) {
+        return throwable instanceof WebClientResponseException && 
+        ((WebClientResponseException) throwable).getStatusCode().is5xxServerError();
     }
 
 }

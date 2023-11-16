@@ -12,7 +12,8 @@ public class PatientDtoTest {
 
     @Test
     public void ctor_populatedAsExcpected() {
-        PatientDto actual = new PatientDto("Kyrre", "Kanin", SexIso5218.MALE.getValue().toString(), LocalDate.now(), "Eventyrland 1", "0001");
+        PatientDto actual = new PatientDto("Kyrre", "Kanin", SexIso5218.MALE.getValue().toString(), LocalDate.now(),
+         "Eventyrland 1", "0001", "Bergen");
 
         assertEquals("Kyrre", actual.getFirstname());
         assertEquals("Kanin", actual.getLastname());
@@ -24,14 +25,14 @@ public class PatientDtoTest {
 
     @Test
     public void ctor_fullnameAsExcpected() {
-        PatientDto actual = new PatientDto("Kyrre", "Kanin", SexIso5218.MALE.getValue().toString(), LocalDate.now(), "Eventyrland 1", "0001");
+        PatientDto actual = new PatientDto("Kyrre", "Kanin", SexIso5218.MALE.getValue().toString(), LocalDate.now(), "Eventyrland 1", "0001", "Bergen");
 
         assertEquals("Kyrre Kanin", actual.getFullName());
     }
 
     @Test
     public void ctor_nullArgumentsNotAllowed() {
-        assertThrows(IllegalArgumentException.class, () -> new PatientDto(null, null, null, null, null, null));
+        assertThrows(IllegalArgumentException.class, () -> new PatientDto(null, null, null, null, null, null, null));
     }
 
 }
