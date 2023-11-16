@@ -1,11 +1,12 @@
 package no.hnikt.patgen.api;
 
+import no.hnikt.patgen.component.FileStore;
 import no.hnikt.patgen.component.AddressGenerator;
-import no.hnikt.patgen.component.AgeGenerator;
 import no.hnikt.patgen.component.BirthdayGenerator;
 import no.hnikt.patgen.component.NameGenerator;
 import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.enums.SexIso5218;
+import no.hnikt.patgen.model.LastNamesPutRequest;
 import no.hnikt.patgen.model.PatientDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +16,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -45,6 +49,9 @@ public class PatientGenerator {
 
     @Autowired
     private BirthdayGenerator birthDateGenerator;
+
+    @Autowired
+    private FileStore fileStore;
 
     @GetMapping("/generate-patient")
     public PatientDto generatePatient(@RequestParam(value = "desiredSex", required = false) String desiredSex) {
@@ -83,26 +90,48 @@ public class PatientGenerator {
     @GetMapping("/lastnames")
     public ResponseEntity<List<String>> getLastnames() {
         LOG.debug("Received GET to /lastnames.");
-        return new ResponseEntity<>(lastnamesMockData(), HttpStatus.OK);
+        try {
+            List<String> list =  fileStore.readAllItems("lastnames.txt");
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/lastnames")
     public ResponseEntity<List<String>> addLastname(@RequestBody String lastname) {
         LOG.debug("Received POST {} to /lastnames.", lastname);
-        return new ResponseEntity<>(lastnamesMockData(), HttpStatus.OK);
+        try {
+            fileStore.writeItemIfNotExist("lastnames.txt", lastname);
+            List<String> list =  fileStore.readAllItems("lastnames.txt");
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/lastnames")
-    public ResponseEntity<ArrayList<String>> deleteLastname(@RequestBody String lastname) {
+    public ResponseEntity<List<String>> deleteLastname(@RequestBody String lastname) {
         LOG.debug("Received DELETE {} to /lastnames.", lastname);
-        return new ResponseEntity<>(lastnamesMockData(), HttpStatus.OK);
+        try {
+            fileStore.deleteItem("lastnames.txt", lastname);
+            List<String> list =  fileStore.readAllItems("lastnames.txt");
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    private ArrayList<String> lastnamesMockData() {
-        ArrayList<String> data = new ArrayList<>();
-        data.add("Nilsen");
-        data.add("Olsen");
-        return data;
+    @PutMapping("/lastnames")
+    public ResponseEntity<List<String>> updateLastname(@RequestBody LastNamesPutRequest request) {
+        LOG.debug("Received PUT {} to /lastnames.", request.oldName);
+        try {
+            fileStore.updateItem("lastnames.txt", request.oldName, request.newName);
+            List<String> list =  fileStore.readAllItems("lastnames.txt");
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

@@ -1,0 +1,6 @@
+services:
+  patgen-backend:
+    volumes:
+      - ${WORKSPACE_FOLDER}/file-db:/root/file-db
+    environment:
+      dirname: "/root/file-db"

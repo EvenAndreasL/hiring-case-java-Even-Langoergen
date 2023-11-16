@@ -1,15 +1,14 @@
 package no.hnikt.patgen.api;
 
 import no.hnikt.patgen.component.AddressGenerator;
-import no.hnikt.patgen.component.AgeGenerator;
 import no.hnikt.patgen.component.BirthdayGenerator;
+import no.hnikt.patgen.component.FileStore;
 import no.hnikt.patgen.component.NameGenerator;
 import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.config.WebConfig;
 import no.hnikt.patgen.enums.SexIso5218;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,6 +44,9 @@ class PatientGeneratorTest {
 
     @MockBean
     private PostalCodeGenerator postalCodeGenerator;
+
+    @MockBean
+    private FileStore fileStore;
 
     @BeforeEach
     void setUp() {
@@ -93,14 +95,14 @@ class PatientGeneratorTest {
     }
 
     @Test
-    @Disabled("Hente og oppdatere tilgjengelige etternavn, i oppgave 4.")
+    //("Hente og oppdatere tilgjengelige etternavn, i oppgave 4.")
     void lastnames_getAll_returnsOk() throws Exception {
         this.mockMvc.perform(get("/lastnames")).andDo(print()).andExpect(status().isOk());
     }
 
 
     @Test
-    @Disabled("Legge til etternavn, i oppgave 4.")
+    //("Legge til etternavn, i oppgave 4.")
     void lastnames_add_new_returnsOk() throws Exception {
         this.mockMvc.perform(post("/lastnames")
                         .with(csrf()) // This is required if you decide to activate csrf (cross site scripting) protection in WebConfig.java.

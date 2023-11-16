@@ -29,10 +29,44 @@ public class SimpleFileStore implements FileStore {
     @Value("${dirname}")
     private String dirname;
 
+    public void updateItem(String filename, String oldItem, String newItem) throws IOException {
+        List<String> itemList = readAllItems(filename);
+        if(itemList.contains(oldItem)){
+            deleteItem(filename, oldItem);
+            writeItemIfNotExist(filename, newItem);
+        } else {
+            LOG.warn("Could not find item.");
+        }
+    }
+
+    public void deleteItem(String filename, String item) throws IOException {
+        List<String> itemList = readAllItems(filename);
+        if(itemList.contains(item)){
+            itemList.remove(item);
+            writeAllItems(filename, itemList);
+        } else {
+            LOG.warn("Could not find item.");
+        }
+    }
+
+    public void writeItemIfNotExist(String filename, String item) throws IOException  {
+        List<String> itemList = readAllItems(filename);
+        if(!itemList.contains(item)){
+            itemList.add(item);
+            writeAllItems(filename, itemList);
+        } else {
+            LOG.warn("Item already exists.");
+        }
+    }
+
     public void writeAllItems(String filename, List<String> allItems) throws IOException {
+        writeAllItems(filename, allItems, false);
+    }
+
+    public void writeAllItems(String filename, List<String> allItems, boolean append) throws IOException {
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Paths.get(this.dirname, filename).toString()), StandardCharsets.UTF_8));
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Paths.get(this.dirname, filename).toString(), append), StandardCharsets.UTF_8));
             for (String item : allItems) {
                 writer.write(item);
                 writer.newLine();
