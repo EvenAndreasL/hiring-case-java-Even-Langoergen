@@ -59,7 +59,7 @@ class PatientGeneratorTest {
         this.mockMvc.perform(get("/generate-patient")).andDo(print()).andExpectAll(
                 status().isOk(),
                 jsonPath("$.age").value(42),
-                jsonPath("$.firstname").value("Jet"),
+                jsonPath("$.firstname", Matchers.anyOf(Matchers.is("Jet"), Matchers.is("Nina"))),
                 jsonPath("$.lastname").value("Li"),
                 jsonPath("$.streetNameAndNumber").value("Hollywood 42"),
                 jsonPath("$.postalCode").value("1337")
@@ -73,7 +73,7 @@ class PatientGeneratorTest {
     }
 
     @Test
-    @Disabled("Sjekk på enten mann eller kvinne, navn og kjønn, i oppgave 2.")
+    //("Sjekk på enten mann eller kvinne, navn og kjønn, i oppgave 2.")
     void generatePatient_sexIsNotApplicable_returnsRandomNameAndSex() throws Exception {
         String notApplicable = SexIso5218.NOT_APPLICABLE.getValue().toString();
         String male = SexIso5218.MALE.getValue().toString();
