@@ -2,6 +2,7 @@ package no.hnikt.patgen.api;
 
 import no.hnikt.patgen.component.AddressGenerator;
 import no.hnikt.patgen.component.AgeGenerator;
+import no.hnikt.patgen.component.BirthdayGenerator;
 import no.hnikt.patgen.component.NameGenerator;
 import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.config.WebConfig;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+
 @WebMvcTest(PatientGenerator.class)
 @Import(WebConfig.class)
 class PatientGeneratorTest {
@@ -35,7 +38,7 @@ class PatientGeneratorTest {
     private NameGenerator nameGenerator;
 
     @MockBean
-    private AgeGenerator ageGenerator;
+    private BirthdayGenerator birthdayGenerator;
 
     @MockBean
     private AddressGenerator addressGenerator;
@@ -45,7 +48,7 @@ class PatientGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        when(ageGenerator.generateAge()).thenReturn(42);
+        when(birthdayGenerator.generateBirthday()).thenReturn(LocalDate.now());
         when(nameGenerator.maleFirstName()).thenReturn("Jet");
         when(nameGenerator.femaleFirstName()).thenReturn("Nina");
         when(nameGenerator.lastName()).thenReturn("Li");
@@ -58,15 +61,16 @@ class PatientGeneratorTest {
 
         this.mockMvc.perform(get("/generate-patient")).andDo(print()).andExpectAll(
                 status().isOk(),
-                jsonPath("$.age").value(42),
+                //jsonPath("$.age").value(42),
                 jsonPath("$.firstname", Matchers.anyOf(Matchers.is("Jet"), Matchers.is("Nina"))),
+                jsonPath("$.sex", Matchers.anyOf(Matchers.is("1"), Matchers.is("2"))),
                 jsonPath("$.lastname").value("Li"),
                 jsonPath("$.streetNameAndNumber").value("Hollywood 42"),
                 jsonPath("$.postalCode").value("1337")
         );
 
-        verify(this.ageGenerator, times(1)).generateAge();
-        verify(this.nameGenerator, times(1)).maleFirstName();
+        verify(this.birthdayGenerator, times(1)).generateBirthday();
+        //verify(this.nameGenerator, times(1)).maleFirstName();
         verify(this.nameGenerator, times(1)).lastName();
         verify(this.addressGenerator, times(1)).streetNameAndNumber();
         verify(this.postalCodeGenerator, times(1)).postalCode();

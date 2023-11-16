@@ -2,6 +2,7 @@ package no.hnikt.patgen.api;
 
 import no.hnikt.patgen.component.AddressGenerator;
 import no.hnikt.patgen.component.AgeGenerator;
+import no.hnikt.patgen.component.BirthdayGenerator;
 import no.hnikt.patgen.component.NameGenerator;
 import no.hnikt.patgen.component.PostalCodeGenerator;
 import no.hnikt.patgen.enums.SexIso5218;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,9 +35,6 @@ public class PatientGenerator {
     private Random random = new Random(System.currentTimeMillis());
 
     @Autowired
-    private AgeGenerator ageGenerator;
-
-    @Autowired
     private NameGenerator nameGenerator;
 
     @Autowired 
@@ -44,9 +43,13 @@ public class PatientGenerator {
     @Autowired 
     private PostalCodeGenerator postalCodeGenerator;
 
+    @Autowired
+    private BirthdayGenerator birthDateGenerator;
+
     @GetMapping("/generate-patient")
     public PatientDto generatePatient(@RequestParam(value = "desiredSex", required = false) String desiredSex) {
-        Integer age = ageGenerator.generateAge();
+
+        LocalDate birthDate = birthDateGenerator.generateBirthday();
         
         String firstname = "";
         String sex = SexIso5218.UNKNOWN.getValue().toString();
@@ -74,7 +77,7 @@ public class PatientGenerator {
         String streetNameAndNumber = addressGenerator.streetNameAndNumber();
         String postalCode = postalCodeGenerator.postalCode();
 
-        return new PatientDto(firstname, lastname, sex, age, streetNameAndNumber, postalCode);
+        return new PatientDto(firstname, lastname, sex, birthDate, streetNameAndNumber, postalCode);
     }
 
     @GetMapping("/lastnames")

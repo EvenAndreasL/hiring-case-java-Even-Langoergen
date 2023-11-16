@@ -30,7 +30,7 @@ public class FileBasedAddressGenerator implements AddressGenerator {
     public String streetNameAndNumber() {
         String address = "";
         try {
-            address = selectAddress("streetname.txt");
+            address = selectAddress("streetnames.txt");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

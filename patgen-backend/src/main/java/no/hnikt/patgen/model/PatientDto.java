@@ -1,5 +1,11 @@
 package no.hnikt.patgen.model;
 
+import java.time.LocalDate;
+import java.time.Period;
+
+import org.springframework.cglib.core.Local;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Class for testpatient with randomized personal details
@@ -12,20 +18,20 @@ public class PatientDto {
 	private String firstname; 
 	private String lastname;
     private String sex;
-	private Integer age;
+	private LocalDate birthDate;
     private String streetNameAndNumber;
     private String postalCode;
 	
-	public PatientDto(String firstname, String lastname, String sex, Integer age,
+	public PatientDto(String firstname, String lastname, String sex, LocalDate birthDate,
      String streetNameAndNumber, String postalCode) {
-		if (firstname == null || lastname == null || sex == null || age == null
+		if (firstname == null || lastname == null || sex == null || birthDate == null
         || streetNameAndNumber == null || postalCode == null) {
 			throw new IllegalArgumentException("null is not valid");
 		}
 		this.firstname = firstname;
 		this.lastname = lastname;
         this.sex = sex;
-		this.age = age;
+		this.birthDate = birthDate;
         this.streetNameAndNumber = streetNameAndNumber;
         this.postalCode = postalCode;
 	}
@@ -46,8 +52,12 @@ public class PatientDto {
         return sex;
     }
 
+    public LocalDate getBirthdate(){
+        return birthDate;
+    }
+    
 	public Integer getAge() {
-		return age;
+		return Period.between(birthDate, LocalDate.now()).getYears();
 	}
 
     public String getStreetNameAndNumber() {
